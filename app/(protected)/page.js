@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,10 +51,20 @@ export default function HomePage() {
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomDescription, setNewRoomDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Debounce search term with 300ms delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Initialize with some mock data
   useEffect(() => {
@@ -101,8 +111,8 @@ export default function HomePage() {
 
   const filteredChatrooms = chatrooms.filter(
     (room) =>
-      room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.description.toLowerCase().includes(searchTerm.toLowerCase())
+      room.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      room.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
   const handleCreateRoom = async () => {
@@ -312,14 +322,14 @@ export default function HomePage() {
               <CardContent className="p-12 text-center">
                 <MessageCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  {searchTerm ? "No rooms found" : "No chatrooms yet"}
+                  {debouncedSearchTerm ? "No rooms found" : "No chatrooms yet"}
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  {searchTerm
+                  {debouncedSearchTerm
                     ? "Try adjusting your search terms"
                     : "Create your first chatroom to get started"}
                 </p>
-                {!searchTerm && (
+                {!debouncedSearchTerm && (
                   <Button
                     onClick={() => setCreateDialogOpen(true)}
                     className="btn-filled"

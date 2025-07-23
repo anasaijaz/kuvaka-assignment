@@ -103,6 +103,80 @@ export const PhoneInput = forwardRef(
 
 PhoneInput.displayName = "PhoneInput";
 
+// Combined country code and phone input component
+export function PhoneInputWithCountry({
+  countries,
+  countriesLoading,
+  countryValue,
+  onCountryChange,
+  phoneProps,
+  countryError,
+  phoneError,
+  placeholder = "Enter phone number",
+}) {
+  if (countriesLoading) {
+    return (
+      <div className="space-y-2">
+        <Label>Phone Number</Label>
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 flex-1" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="phone">Phone Number</Label>
+      <div className="flex gap-2 items-center ">
+        {/* Country Code Selector */}
+        <Select value={countryValue} onValueChange={onCountryChange}>
+          <SelectTrigger
+            className={cn(
+              "w-30 flex-shrink-0",
+              countryError && "border-destructive focus:ring-destructive"
+            )}
+          >
+            <SelectValue placeholder="+1" />
+          </SelectTrigger>
+          <SelectContent className="max-h-60">
+            {countries.map((country) => (
+              <SelectItem key={country.code} value={country.dialCode}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{country.flag}</span>
+                  <span className="font-mono font-semibold">
+                    {country.dialCode}
+                  </span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Phone Number Input */}
+        <div className="relative flex-1">
+          <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="tel"
+            placeholder={placeholder}
+            className={cn(
+              "pl-10",
+              phoneError && "border-destructive focus:ring-destructive"
+            )}
+            {...phoneProps}
+          />
+        </div>
+      </div>
+      {(countryError || phoneError) && (
+        <p className="text-sm text-destructive">
+          {countryError?.message || phoneError?.message}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // OTP input component
 export function OTPInput({ value, onChange, error, disabled }) {
   return (

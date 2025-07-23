@@ -11,6 +11,7 @@ import {
   AuthCard,
   CountrySelector,
   PhoneInput,
+  PhoneInputWithCountry,
   OTPInput,
   StepIndicator,
   LoadingButton,
@@ -81,20 +82,17 @@ export default function LoginPage() {
               onSubmit={phoneForm.handleSubmit(handlePhoneSubmit)}
               className="space-y-6"
             >
-              <CountrySelector
+              <PhoneInputWithCountry
                 countries={countries}
-                loading={countriesLoading}
-                value={phoneForm.watch("countryCode")}
-                onValueChange={(value) =>
+                countriesLoading={countriesLoading}
+                countryValue={phoneForm.watch("countryCode")}
+                onCountryChange={(value) =>
                   phoneForm.setValue("countryCode", value)
                 }
-                error={phoneForm.formState.errors.countryCode}
-              />
-
-              <PhoneInput
-                {...phoneForm.register("phoneNumber")}
+                phoneProps={phoneForm.register("phoneNumber")}
+                countryError={phoneForm.formState.errors.countryCode}
+                phoneError={phoneForm.formState.errors.phoneNumber}
                 placeholder="Enter your phone number"
-                error={phoneForm.formState.errors.phoneNumber}
               />
 
               <LoadingButton
